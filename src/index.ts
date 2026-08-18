@@ -1,18 +1,29 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+export interface Env {}
 
 export default {
-	async fetch(request, env, ctx): Promise<Response> {
-		return new Response("Hello World!");
+	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		console.log(request.body);
+		console.log(request.headers);
+		console.log(request.method);
+
+		// We can get the request URL and according to that we can show results.
+		const url = new URL(request.url);
+		const pathname = url.pathname;
+		console.log("pathname: ", pathname);
+		
+
+		if (request.method === 'GET' && pathname === "/") {
+			return Response.json({
+				message: 'You have sent a GET request.',
+			});
+		} else if (request.method === "GET" && pathname === '/api/users') {
+			return Response.json({
+				message: 'You are hitting the users path',
+			});
+		} else {
+			return Response.json({
+				message: 'You have sent a different request!',
+			});
+		}
 	},
-} satisfies ExportedHandler<Env>;
+};
